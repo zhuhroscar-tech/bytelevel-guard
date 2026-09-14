@@ -46,8 +46,18 @@ warning: just garbled text in production.
 
 ## Install
 
+Not yet published to PyPI. Install the latest GitHub Release wheel directly
+(checksum-verified, CI-built):
+
 ```bash
-pip install bytelevel-guard
+pip install https://github.com/zhuhroscar-tech/bytelevel-guard/releases/latest/download/bytelevel_guard-0.1.0-py3-none-any.whl
+```
+
+Or from source:
+
+```bash
+git clone https://github.com/zhuhroscar-tech/bytelevel-guard.git
+cd bytelevel-guard && pip install -e ".[dev]"
 ```
 
 ## Usage
