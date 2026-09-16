@@ -27,7 +27,7 @@ safe single-character representation in the vocabulary. Bytes in the
 control-character ranges (0x00-0x20, 0x7f, 0x80-0xa0) get remapped to
 codepoints starting at U+0100 (e.g. byte 0x0D -> 'č' U+010D).
 
-A real, currently-unresolved bug in HuggingFace's `tokenizers`/`transformers`
+A bug in HuggingFace's `tokenizers`/`transformers`
 (github.com/huggingface/tokenizers/issues/1996, confirmed against GPT-2,
 Qwen3.5, Mistral-Ministral-3, NVIDIA Nemotron-3, and LiquidAI LFM2.5) causes
 the fast Rust decoder to truncate these remapped characters back to their
@@ -40,6 +40,12 @@ bytelevel-guard scans a tokenizer.json / vocab.json (or ad-hoc strings) for
 any token containing one of these at-risk characters, so the corruption can
 be caught in CI before a vocabulary extension ships, rather than surfacing
 as silent garbled output in production.
+
+Note: GitHub issue #1996 is closed, but that only shipped opt-in building
+blocks, not an automatic fix for the common add_tokens() call path --
+verified still-reproducing on tokenizers==0.23.2 (2026-09-15). See README
+"Honest limitations" for the full explanation. Closed-issue status is not
+proof the bug is gone from your installed version; run this tool either way.
 """
 
 
