@@ -13,6 +13,8 @@ Check custom tokens for ByteLevel-BPE decode-corruption risks before extending a
 
 The motivating bug is [tokenizers#1996](https://github.com/huggingface/tokenizers/issues/1996): literal characters such as `ć` in added tokens can decode as control bytes. A closed upstream issue is not evidence that your installed tokenizer and token-addition path are unaffected.
 
+`check` scans only `added_tokens` in a `tokenizer.json` -- the bug class is specific to tokens that bypass the normal ByteLevel encode step. Base `model.vocab` entries are not scanned: they legitimately contain byte-remap characters (e.g. the space marker `Ġ`, U+0120) in most entries as part of correct ByteLevel-BPE encoding, and flagging them would make every real tokenizer report false positives. Pass a bare `vocab.json` (no `added_tokens`/`model` keys) to check every entry instead, since that shape has no added/base distinction.
+
 ## Install
 
 Requires Python 3.9+. The static scanner has no third-party runtime dependencies. Install from source in a virtual environment:

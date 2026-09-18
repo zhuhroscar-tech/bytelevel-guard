@@ -45,7 +45,10 @@ def test_scan_tokenizer_json_added_tokens(tmp_path):
     path.write_text(json.dumps(data), encoding="utf-8")
 
     result = scan_tokenizer_json_file(path)
-    assert result.tokens_scanned == 4  # 2 added_tokens + 2 vocab entries
+    # Only added_tokens are scanned, not base model.vocab -- see
+    # test_base_vocab_false_positive.py for why base-vocab tokens (which
+    # legitimately contain byte-remap markers like 'Ġ') must not count.
+    assert result.tokens_scanned == 2  # 2 added_tokens only
     assert len(result.findings) == 1
     assert result.findings[0].token_repr == repr("kuća")
     assert result.findings[0].source == str(path)
@@ -61,7 +64,10 @@ def test_scan_tokenizer_json_bare_vocab_file(tmp_path):
     assert len(result.findings) == 1
 
 
-def test_scan_tokenizer_json_vocab_as_list_pairs(tmp_path):
+def test_scan_tokenizer_json_vocab_as_list_pairs_is_not_scanned(tmp_path):
+    # model.vocab (in any format, including the list-of-pairs shape some
+    # tokenizer.json files use) is base vocabulary, not an added token --
+    # it must NOT be scanned even when added_tokens is empty.
     data = {
         "added_tokens": [],
         "model": {"vocab": [["hello", 0], ["kuća", 1]]},
@@ -70,8 +76,8 @@ def test_scan_tokenizer_json_vocab_as_list_pairs(tmp_path):
     path.write_text(json.dumps(data), encoding="utf-8")
 
     result = scan_tokenizer_json_file(path)
-    assert result.tokens_scanned == 2
-    assert len(result.findings) == 1
+    assert result.tokens_scanned == 0
+    assert result.is_clean
 
 
 def test_scan_tokenizer_json_missing_file_raises(tmp_path):

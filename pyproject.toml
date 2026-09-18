@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "bytelevel-guard"
-version = "0.1.0"
+version = "0.1.1"
 description = "Detect ByteLevel-BPE added-token decode corruption (the tokenizers#1996 bug class) in tokenizer.json/vocab.json before it ships."
 readme = "README.md"
 license = {text = "MIT"}

@@ -57,32 +57,39 @@ def scan_token_string(token: str, source: str = "<string>") -> list[Finding]:
 
 
 def _iter_added_tokens_from_tokenizer_json(data: dict) -> list[str]:
+    """Return only the tokens added via added_tokens/add_tokens().
+
+    This is deliberately narrower than "everything in the file": the
+    tokenizers#1996 bug class is specific to tokens that bypass the normal
+    ByteLevel pre-tokenizer encode step (added_tokens/add_tokens() calls).
+    Tokens that are part of the base BPE vocabulary (model.vocab) arrived
+    there *through* the correct byte-level encode pipeline and are
+    expected, by design, to contain remapped characters -- e.g. the
+    space-marker 'Ġ' (U+0120) appears in the majority of real GPT-2/
+    RoBERTa/Qwen-family vocab entries. Including base vocab here would
+    flag that completely normal encoding as an "at risk" finding on every
+    real tokenizer, defeating the tool's own CI-gate use case.
+    """
     tokens = []
     for entry in data.get("added_tokens", []) or []:
         content = entry.get("content")
         if isinstance(content, str):
             tokens.append(content)
-    model = data.get("model", {}) or {}
-    vocab = model.get("vocab")
-    if isinstance(vocab, dict):
-        tokens.extend(k for k in vocab.keys() if isinstance(k, str))
-    elif isinstance(vocab, list):
-        for item in vocab:
-            if isinstance(item, list) and item and isinstance(item[0], str):
-                tokens.append(item[0])
-            elif isinstance(item, str):
-                tokens.append(item)
     return tokens
 
 
 def scan_tokenizer_json_file(path: Path) -> ScanResult:
     """Scan a HuggingFace tokenizer.json (or vocab.json) for at-risk tokens.
 
-    Only tokens that are explicitly listed as *added tokens* (or, more
-    broadly, anything in the base vocab) are checked -- these are the
-    surface where tokenizers#1996-class corruption manifests, since normal
-    byte-level pre-tokenization output never contains a raw remapped
-    character outside its expected position.
+    Only tokens explicitly listed as *added tokens* are checked against a
+    full tokenizer.json -- this is the surface where tokenizers#1996-class
+    corruption manifests, since normal byte-level pre-tokenization output
+    (the base model.vocab) never contains a raw remapped character outside
+    its expected, correctly-encoded position. A bare vocab.json (no
+    "added_tokens"/"model" keys, i.e. not a full tokenizer.json) has no way
+    to distinguish added vs. base tokens, so every key is checked -- that
+    is an explicit, narrower input shape used for ad-hoc vocab review, not
+    the default tokenizer.json CI-gate workflow.
     """
     data = json.loads(path.read_text(encoding="utf-8"))
     result = ScanResult()
@@ -90,7 +97,8 @@ def scan_tokenizer_json_file(path: Path) -> ScanResult:
     if isinstance(data, dict) and ("added_tokens" in data or "model" in data):
         tokens = _iter_added_tokens_from_tokenizer_json(data)
     elif isinstance(data, dict):
-        # bare vocab.json: {token: id, ...}
+        # bare vocab.json: {token: id, ...} -- no added/base distinction
+        # exists in this shape, so check every key.
         tokens = [k for k in data.keys() if isinstance(k, str)]
     else:
         tokens = []
