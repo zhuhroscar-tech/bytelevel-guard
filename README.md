@@ -38,7 +38,7 @@ bytelevel-guard explain
 python -m pytest
 ```
 
-Replace `tokenizer.json` with your own file. Exit codes: `0` means no risky characters found, `1` means findings, and `2` means an input path was not found (also used by argparse for invalid arguments).
+Replace `tokenizer.json` with your own file. Exit codes: `0` means no risky characters found, `1` means findings, and `2` means an input path could not be checked (not found, not a regular file, not valid UTF-8, or not valid JSON -- also used by argparse for invalid arguments).
 
 ## Honest limitations
 

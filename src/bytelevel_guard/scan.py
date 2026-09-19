@@ -78,6 +78,12 @@ def _iter_added_tokens_from_tokenizer_json(data: dict) -> list[str]:
     return tokens
 
 
+class ScanInputError(ValueError):
+    """Raised for any unusable input path: not a file, bad encoding, or
+    invalid JSON. Callers (the CLI) turn this into a clean error message
+    instead of letting the exception propagate as a raw traceback."""
+
+
 def scan_tokenizer_json_file(path: Path) -> ScanResult:
     """Scan a HuggingFace tokenizer.json (or vocab.json) for at-risk tokens.
 
@@ -90,8 +96,25 @@ def scan_tokenizer_json_file(path: Path) -> ScanResult:
     to distinguish added vs. base tokens, so every key is checked -- that
     is an explicit, narrower input shape used for ad-hoc vocab review, not
     the default tokenizer.json CI-gate workflow.
+
+    Raises ScanInputError (never a raw OS/json/unicode exception) if the
+    path is not a regular file, is not valid UTF-8, or is not valid JSON --
+    a directory, a mistaken glob expansion, or a corrupted/binary file are
+    all realistic accidental CLI inputs and must produce a clean CLI error
+    rather than an unhandled traceback.
     """
-    data = json.loads(path.read_text(encoding="utf-8"))
+    if not path.exists():
+        raise FileNotFoundError(f"{path} does not exist")
+    if not path.is_file():
+        raise ScanInputError(f"{path} is not a file (directory or special file?)")
+    try:
+        raw = path.read_text(encoding="utf-8")
+    except UnicodeDecodeError as exc:
+        raise ScanInputError(f"{path} could not be decoded as UTF-8: {exc}") from exc
+    try:
+        data = json.loads(raw)
+    except json.JSONDecodeError as exc:
+        raise ScanInputError(f"{path} is not valid JSON: {exc}") from exc
     result = ScanResult()
 
     if isinstance(data, dict) and ("added_tokens" in data or "model" in data):

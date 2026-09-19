@@ -38,7 +38,7 @@ bytelevel-guard explain
 python -m pytest
 ```
 
-请将 `tokenizer.json` 换成自己的文件。退出码：`0` 表示未发现风险字符，`1` 表示有发现，`2` 表示输入路径不存在（argparse 的参数错误也使用此退出码）。
+请将 `tokenizer.json` 换成自己的文件。退出码：`0` 表示未发现风险字符，`1` 表示有发现，`2` 表示输入路径无法检查（不存在、不是常规文件、非 UTF-8 编码，或不是合法 JSON；argparse 的参数错误也使用此退出码）。
 
 ## 使用限制
 

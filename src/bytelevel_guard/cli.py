@@ -12,7 +12,7 @@ import sys
 from pathlib import Path
 
 from bytelevel_guard import __version__
-from bytelevel_guard.scan import ScanResult, scan_strings, scan_tokenizer_json_file
+from bytelevel_guard.scan import ScanInputError, ScanResult, scan_strings, scan_tokenizer_json_file
 from bytelevel_guard.style import (
     print_fields,
     resolve_style,
@@ -82,7 +82,12 @@ def _cmd_check(args, style) -> int:
             print(status_headline(style, "fail", f"not found: {path}"))
             exit_code = 2
             continue
-        result = scan_tokenizer_json_file(path)
+        try:
+            result = scan_tokenizer_json_file(path)
+        except (ScanInputError, FileNotFoundError) as exc:
+            print(status_headline(style, "fail", str(exc)))
+            exit_code = 2
+            continue
         rc = _print_result(style, result, str(path))
         exit_code = max(exit_code, rc)
     return exit_code
