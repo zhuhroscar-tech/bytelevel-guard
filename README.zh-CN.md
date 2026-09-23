@@ -4,6 +4,8 @@
 
 在扩展 Hugging Face 词表前，检查自定义 token 是否存在 ByteLevel-BPE 解码损坏风险。CLI 使用 GPT-2 的字节到 Unicode 映射表，支持字符串、`tokenizer.json` 和独立的 `vocab.json`。
 
+![bytelevel-guard 示例输出](docs/images/example-output.png)
+
 ## 检查内容
 
 - 扫描新增 token 和词表中的重映射字符。

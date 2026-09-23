@@ -4,6 +4,8 @@
 
 Check custom tokens for ByteLevel-BPE decode-corruption risks before extending a Hugging Face vocabulary. The CLI scans strings, `tokenizer.json`, or a bare `vocab.json` using the GPT-2 byte-to-Unicode remapping table.
 
+![bytelevel-guard example output](docs/images/example-output.png)
+
 ## What it checks
 
 - Finds remapped characters in added tokens and vocabulary entries.
