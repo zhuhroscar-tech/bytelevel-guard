@@ -29,7 +29,7 @@ source .venv/bin/activate
 python -m pip install -e ".[dev]"
 ```
 
-`dev` extra 包含 pytest 和 `tokenizers`，可测试真实后端。也可从 [Releases](https://github.com/zhuhroscar-tech/bytelevel-guard/releases) 下载 wheel；安装前请核对对应 release 的校验和。
+`dev` extra 包含 pytest 和 `tokenizers`，可测试真实后端。也可从 [Releases](https://github.com/zhuhroscar-tech/bytelevel-guard/releases) 下载 wheel；安装前请核对对应 release 的 `SHA256SUMS.txt` 校验和。发布历史见 [CHANGELOG.md](CHANGELOG.md)。
 
 ## 快速上手
 

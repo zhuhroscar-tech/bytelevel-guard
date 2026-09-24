@@ -29,7 +29,7 @@ source .venv/bin/activate
 python -m pip install -e ".[dev]"
 ```
 
-The `dev` extra includes pytest and `tokenizers` for live-backend tests. A wheel is also available from [Releases](https://github.com/zhuhroscar-tech/bytelevel-guard/releases); verify it against that release's checksums before installing.
+The `dev` extra includes pytest and `tokenizers` for live-backend tests. A wheel is also available from [Releases](https://github.com/zhuhroscar-tech/bytelevel-guard/releases); verify it against that release's `SHA256SUMS.txt` checksums before installing. See [CHANGELOG.md](CHANGELOG.md) for release history.
 
 ## Quick start
 
