@@ -63,6 +63,7 @@ def test_changelog_documents_current_version_and_prior_bugfixes():
 def test_ci_exercises_tests_build_and_release_artifacts():
     workflow = CI_WORKFLOW.read_text(encoding="utf-8")
 
+    assert 'tags: ["v*"]' in workflow
     assert "python -m pytest" in workflow
     assert "python -m build" in workflow
     assert "bytelevel-guard --version" in workflow

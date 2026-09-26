@@ -26,3 +26,11 @@ def test_setuptools_floor_supports_spdx_license_metadata():
     text = _pyproject_text()
 
     assert 'requires = ["setuptools>=77", "wheel"]' in text
+
+
+def test_project_urls_include_support_and_release_history_links():
+    text = _pyproject_text()
+
+    assert 'Homepage = "https://github.com/zhuhroscar-tech/bytelevel-guard"' in text
+    assert 'Issues = "https://github.com/zhuhroscar-tech/bytelevel-guard/issues"' in text
+    assert 'Changelog = "https://github.com/zhuhroscar-tech/bytelevel-guard/blob/main/CHANGELOG.md"' in text

@@ -2,6 +2,12 @@
 
 All notable changes to `bytelevel-guard` are documented here.
 
+## v0.1.6 — 2026-09-26
+
+- Added package Homepage, Issues, and Changelog metadata so built wheels expose maintenance links.
+- Made GitHub Actions run explicitly on `v*` release tags, matching the release validation contract.
+- Added regression coverage for package resource links and tag-triggered CI wiring.
+
 ## v0.1.5 — 2026-09-24
 
 - Added this changelog so source checkouts expose release history without requiring GitHub UI access.
